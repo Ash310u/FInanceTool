@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Financial Reporting Tool</title>
+    
+    <!-- AG Grid CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ag-grid-community@31.0.1/styles/ag-grid.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ag-grid-community@31.0.1/styles/ag-theme-alpine.css">
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <div id="app">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-content">
+                <h1>
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                        <polyline points="14 2 14 8 20 8"/>
+                        <line x1="9" y1="15" x2="15" y2="15"/>
+                        <line x1="9" y1="11" x2="15" y2="11"/>
+                    </svg>
+                    Financial Reporting Tool
+                </h1>
+                <div class="header-actions">
+                    <button id="loadFileBtn" class="btn btn-primary">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                            <polyline points="17 8 12 3 7 8"/>
+                            <line x1="12" y1="3" x2="12" y2="15"/>
+                        </svg>
+                        Load Excel File
+                    </button>
+                    <button id="exportBtn" class="btn btn-secondary" disabled>
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                            <polyline points="7 10 12 15 17 10"/>
+                            <line x1="12" y1="15" x2="12" y2="3"/>
+                        </svg>
+                        Export to Excel
+                    </button>
+                    <button id="refreshBtn" class="btn btn-secondary" disabled>
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="23 4 23 10 17 10"/>
+                            <polyline points="1 20 1 14 7 14"/>
+                            <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/>
+                        </svg>
+                        Refresh
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- File input (hidden) -->
+        <input type="file" id="fileInput" accept=".xlsx,.xls" style="display: none;">
+
+        <!-- Loading overlay -->
+        <div id="loadingOverlay" class="loading-overlay" style="display: none;">
+            <div class="loading-spinner">
+                <div class="spinner"></div>
+                <p id="loadingText">Loading...</p>
+            </div>
+        </div>
+
+        <!-- Main content -->
+        <main class="main-content">
+            <!-- Filter section -->
+            <section id="filterSection" class="filter-section" style="display: none;">
+                <div class="filter-header">
+                    <h2>Filters</h2>
+                    <button id="clearFiltersBtn" class="btn btn-text">Clear All</button>
+                </div>
+                <div class="filter-grid">
+                    <div class="filter-item">
+                        <label for="filterDate">Date</label>
+                        <select id="filterDate" class="filter-select">
+                            <option value="">All Dates</option>
+                        </select>
+                    </div>
+                    <div class="filter-item">
+                        <label for="filterEntityType">Entity Type</label>
+                        <select id="filterEntityType" class="filter-select">
+                            <option value="">All Types</option>
+                        </select>
+                    </div>
+                    <div class="filter-item">
+                        <label for="filterEntitySubType">Entity Sub Type</label>
+                        <select id="filterEntitySubType" class="filter-select">
+                            <option value="">All Sub Types</option>
+                        </select>
+                    </div>
+                    <div class="filter-item">
+                        <label for="filterEntityName">Entity Name</label>
+                        <select id="filterEntityName" class="filter-select">
+                            <option value="">All Names</option>
+                        </select>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Info bar -->
+            <section id="infoBar" class="info-bar" style="display: none;">
+                <div class="info-item">
+                    <span class="info-label">Total Rows:</span>
+                    <span id="totalRows" class="info-value">0</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">File:</span>
+                    <span id="fileName" class="info-value">No file loaded</span>
+                </div>
+            </section>
+
+            <!-- Grid container -->
+            <section id="gridSection" class="grid-section" style="display: none;">
+                <div id="myGrid" class="ag-theme-alpine"></div>
+            </section>
+
+            <!-- Totals footer -->
+            <section id="totalsSection" class="totals-section" style="display: none;">
+                <div class="totals-container">
+                    <div class="totals-label">TOTALS</div>
+                    <div class="totals-grid">
+                        <div class="total-item">
+                            <span class="total-label">Cash Dr (R):</span>
+                            <span id="totalCashDr" class="total-value">0.00</span>
+                        </div>
+                        <div class="total-item">
+                            <span class="total-label">Cash Cr (P):</span>
+                            <span id="totalCashCr" class="total-value">0.00</span>
+                        </div>
+                        <div class="total-item">
+                            <span class="total-label">Bank Dr (R):</span>
+                            <span id="totalBankDr" class="total-value">0.00</span>
+                        </div>
+                        <div class="total-item">
+                            <span class="total-label">Bank Cr (P):</span>
+                            <span id="totalBankCr" class="total-value">0.00</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Empty state -->
+            <section id="emptyState" class="empty-state">
+                <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                    <polyline points="14 2 14 8 20 8"/>
+                    <line x1="9" y1="15" x2="15" y2="15"/>
+                </svg>
+                <h2>No Data Loaded</h2>
+                <p>Click "Load Excel File" to get started</p>
+            </section>
+        </main>
+
+        <!-- Status bar -->
+        <footer class="status-bar">
+            <div id="statusText">Ready</div>
+            <div id="connectionStatus" class="connection-status">
+                <span class="status-dot"></span>
+                Backend Connected
+            </div>
+        </footer>
+    </div>
+
+    <!-- AG Grid JavaScript -->
+    <script src="https://cdn.jsdelivr.net/npm/ag-grid-community@31.0.1/dist/ag-grid-community.js"></script>
+    
+    <!-- Application JavaScript -->
+    <script src="js/grid-config.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
+
