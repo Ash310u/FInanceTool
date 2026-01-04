@@ -1,2 +1,40 @@
-venv
-node_modules
+# Dependencies
+node_modules/
+venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Build outputs
+dist/
+build/
+backend/dist/
+backend/build/
+*.spec.bak
+
+# Logs
+*.log
+backend.log
+frontend.log
+
+# OS files
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~
+
+# IDE
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# Environment
+.env
+.env.local
+
+# Electron
+out/
+packages/
